@@ -1,9 +1,9 @@
-use crate::error::{Result, ScribeError, map_provider_error};
+use crate::error::{map_provider_error, Result, ScribeError};
 use crate::types::{Artifact, Intent, Specification};
 use rig::agent::Agent;
 use rig::client::{CompletionClient, ProviderClient};
 use rig::completion::{CompletionModel, Prompt};
-use rig::providers::gemini::{Client, completion};
+use rig::providers::gemini::Client;
 
 pub type LlmAgent = Agent<rig::providers::gemini::completion::CompletionModel>;
 const MODEL: &str = "gemini-2.0-flash-lite";
@@ -82,8 +82,9 @@ impl Chief {
     pub async fn review(&self, spec: &Specification, draft: &str) -> Result<Artifact> {
         let input = format!(
             "
-            make rebust following prompte:
-            Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\nbe highly discritpive and use all best practice and if needed use websearch. Return only final system prompte without any addition text and without asking additional question. \n",
+            refactorer rebust following prompte:
+            Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\n\
+            Instruction: Be highly descriptive and use all best practice and if needed use websearch. Return only final system prompt without any addition text final prompt and without asking additional question. \n",
             spec.goal, spec.constraints, draft
         );
         let final_prompt = self
