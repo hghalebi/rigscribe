@@ -6,7 +6,9 @@ use rig::completion::{CompletionModel, Prompt};
 use rig::providers::gemini::Client;
 
 pub type LlmAgent = Agent<rig::providers::gemini::completion::CompletionModel>;
-const MODEL: &str = "gemini-2.0-flash-lite";
+//const MODEL: &str = "gemini-2.0-flash-lite";
+//const MODEL: &str = "gemini-2.5-flash";
+const MODEL: &str = "gemini-3-pro-preview";
 
 pub struct Chief {
     architect: LlmAgent,

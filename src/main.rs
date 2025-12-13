@@ -4,6 +4,7 @@ use termimad::MadSkin;
 async fn main() -> Result<()> {
     //println!("Hello, world!");
     let scribe = RigScribe::from_env()?;
+    eprintln!("\n\nOptimizing ...\n\n");
     let artifact = scribe.optimize("generate a function in python").await?;
     // rendering result in markdown format.
     let skin = MadSkin::default();
