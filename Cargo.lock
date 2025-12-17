@@ -1717,7 +1717,9 @@ name = "rigscribe"
 version = "0.1.0"
 dependencies = [
  "rig-core",
+ "schemars",
  "serde",
+ "serde_json",
  "termimad",
  "thiserror",
  "tokio",

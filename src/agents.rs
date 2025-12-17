@@ -1,27 +1,28 @@
-use crate::error::{map_provider_error, Result, ScribeError};
-use crate::types::{Artifact, Intent, Specification};
+use crate::error::{Result, ScribeError, map_provider_error};
+use crate::types::{Artifact, Intent, RigScribeConfig, Specification};
 use rig::agent::Agent;
 use rig::client::{CompletionClient, ProviderClient};
 use rig::completion::{CompletionModel, Prompt};
 use rig::providers::gemini::Client;
-
-pub type LlmAgent = Agent<rig::providers::gemini::completion::CompletionModel>;
+use schemars::JsonSchema;
+pub type Worker = Agent<rig::providers::gemini::completion::CompletionModel>;
 //const MODEL: &str = "gemini-2.0-flash-lite";
 //const MODEL: &str = "gemini-2.5-flash";
 const MODEL: &str = "gemini-3-pro-preview";
 
 pub struct Chief {
-    architect: LlmAgent,
-    builder: LlmAgent,
-    chief: LlmAgent,
+    architect: Worker,
+    builder: Worker,
+    chief: Worker,
 }
 
 impl Chief {
     pub fn from_env() -> Result<Self> {
+        let model = RigScribeConfig::default().model;
         require_env("GEMINI_API_KEY")?;
         let client = Client::from_env();
         let architect = client
-            .agent(MODEL)
+            .agent(model)
             .preamble(
                 "
                 Role: Senior Solution Architect\n\
@@ -32,7 +33,7 @@ impl Chief {
             .build();
 
         let builder = client
-            .agent(MODEL)
+            .agent(model)
             .preamble(
                 "
                 Role: Prompt Engineer\n\
@@ -42,7 +43,7 @@ impl Chief {
             )
             .build();
         let chief = client
-            .agent(MODEL)
+            .agent(model)
             .preamble(
                 "
                 Role: Chief Prompt Officer\n\
@@ -84,7 +85,7 @@ impl Chief {
     pub async fn review(&self, spec: &Specification, draft: &str) -> Result<Artifact> {
         let input = format!(
             "
-            refactorer rebust following prompte:
+            refactorer to reboost following prompt:
             Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\n\
             Instruction: Be highly descriptive and use all best practice and if needed use websearch. Return only final system prompt without any addition text final prompt and without asking additional question. \n",
             spec.goal, spec.constraints, draft

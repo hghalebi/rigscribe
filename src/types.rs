@@ -1,10 +1,31 @@
-#[allow(unused)]
 #[allow(dead_code)]
 #[allow(unused_imports)]
+#[allow(unused_assignments)]
+#[allow(unused)]
 use crate::error::{Result, ScribeError};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
+//pub const MODEL: &str = "gemini-3-pro-preview";
+//pub const MODEL: &str = "gemini-2.5-flash-lite";
+pub const MODEL: &str = "gemini-2.5-pro";
+//ub const MODEL: &str = "gemini-2.5-flash";
+//pub const MODEL: &str = "gemini-2.0-flash-lite";
+// pub const MODEL: &str = "gemini-1.5-pro";
 #[derive(Debug, Clone)]
+pub struct RigScribeConfig {
+    pub model: &'static str,
+}
+impl RigScribeConfig {
+    fn set_model(&mut self, model: &'static str) {
+        self.model = model;
+    }
+}
+impl Default for RigScribeConfig {
+    fn default() -> Self {
+        Self { model: MODEL }
+    }
+}
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct Intent {
     pub text: String,
 }
@@ -19,13 +40,13 @@ impl Intent {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct Specification {
     pub goal: String,
     pub constraints: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct Artifact {
     pub system_prompt: String,
     pub signed_by: String,

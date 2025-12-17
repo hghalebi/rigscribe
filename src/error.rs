@@ -25,6 +25,9 @@ pub enum ScribeError {
         "Protocol violation: {0}. Hint: Proider return an unexpected format or reject the payload"
     )]
     ProtocolViolation(String),
+
+    #[error("Extraction failed: {0}")]
+    Extraction(#[from] rig::extractor::ExtractionError),
 }
 
 pub fn map_provider_error(e: rig::completion::PromptError) -> ScribeError {
