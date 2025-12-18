@@ -1,25 +1,17 @@
-#[allow(dead_code)]
-#[allow(unused)]
-#[allow(unused_imports)]
-use crate::agents::Worker;
-use crate::agents::require_env;
+use crate::error::map_provider_error;
 use crate::error::Result;
 use crate::error::ScribeError;
-use crate::error::map_provider_error;
 use crate::types::MODEL;
 pub use crate::types::{Artifact, Intent, Specification};
+use crate::utilities::require_env;
 use rig::completion::Prompt;
-use rig::message::Image;
+
 use rig::prelude::*;
 use rig::providers::gemini::Client;
-use rig::{
-    agent::{Agent, AgentBuilder},
-    completion::{Chat, CompletionModel, PromptError, ToolDefinition},
-    tool::Tool,
-};
+use rig::{completion::ToolDefinition, tool::Tool};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+
 #[derive(Serialize, Deserialize)]
 pub struct Deconstructor;
 impl Tool for Deconstructor {
@@ -31,9 +23,9 @@ impl Tool for Deconstructor {
 
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         ToolDefinition {
-             name: "Deconstructor".to_string(),
-             description: "this tools take a raw prompte and give back it Specification include goal and constrian".to_string(),
-             parameters: serde_json::json!({
+            name: "Deconstructor".to_string(),
+            description: "this tools take a raw prompte and give back it Specification include goal and constrian".to_string(),
+            parameters: serde_json::json!({
                  "type": "object",
                  "properties": {
                      "text": {
@@ -43,8 +35,8 @@ impl Tool for Deconstructor {
 
                  },
                  "required":["text"]
-             })
-         }
+             }),
+        }
     }
 
     async fn call(&self, args: Self::Args) -> Result<Self::Output> {
@@ -92,9 +84,9 @@ impl Tool for PromptReviewer {
 
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         ToolDefinition {
-             name: "PromptReviewer".to_string(),
-             description: "this tools take a raw prompte it will evelaute that given promte wiuth its Specification include goal and constrian".to_string(),
-             parameters: serde_json::json!({
+            name: "PromptReviewer".to_string(),
+            description: "this tools take a raw prompte it will evelaute that given promte wiuth its Specification include goal and constrian".to_string(),
+            parameters: serde_json::json!({
                  "type": "object",
                  "properties": {
                      "raw_intent_text": {
@@ -109,8 +101,8 @@ impl Tool for PromptReviewer {
                      "required":["raw_intent_text","gaol","constraints"],
 
                  }
-             })
-         }
+             }),
+        }
     }
 
     async fn call(&self, args: Self::Args) -> Result<Self::Output> {
@@ -127,11 +119,11 @@ impl Tool for PromptReviewer {
                 ",
             )
             .build();
-        let input = format!(  "
+        let input = format!("
         Critisize following prompt base on given property:
         Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\n\
         Instruction: Be highly cretical and persimiste and find every defit or any point which could be better. and use all best practice and if needed use websearch.  \n",
-        args.goal, args.constraints, args.raw_intent_text);
+                            args.goal, args.constraints, args.raw_intent_text);
 
         let repons = prompt_reviewer.prompt(input).await?;
         let artifact_extractor = client.extractor::<Artifact>(MODEL).build();

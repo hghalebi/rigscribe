@@ -1,7 +1,3 @@
-#[allow(unused)]
-#[allow(dead_code)]
-#[allow(unused_imports)]
-#[allow(unused_assignments)]
 use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, ScribeError>;
@@ -22,7 +18,7 @@ pub enum ScribeError {
     Provider(#[from] rig::completion::PromptError),
 
     #[error(
-        "Protocol violation: {0}. Hint: Proider return an unexpected format or reject the payload"
+        "Protocol violation: {0}. Hint: Provider return an unexpected format or reject the payload"
     )]
     ProtocolViolation(String),
 

@@ -1,7 +1,3 @@
-#[allow(dead_code)]
-#[allow(unused_imports)]
-#[allow(unused_assignments)]
-#[allow(unused)]
 use crate::error::{Result, ScribeError};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

@@ -17,14 +17,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e7547298-531d-4f68-9426-f296de526604" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rigscribe.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utilities.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agents.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agents.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/error.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/error.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipline.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/types.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,11 +33,12 @@
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
+      <entry key="_/Users/hamzeghalebi/RustroverProjects/rigscribe" value="371xjCclnIwuMYGpnhTrMRpy5wa" />
       <entry key="_/Users/hamzeghalebi/project/opensource/rigscribe" value="36iPI7fUum5tsq9UFhxVxsfu9VT" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="16" />
+    <option name="cachedIndexableFilesCount" value="18" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
@@ -63,7 +63,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/hghalebi/rigscribe.git&quot;,
+    &quot;url&quot;: &quot;git@github.com:hghalebi/rigscribe.git&quot;,
     &quot;accountId&quot;: &quot;03897482-bb04-464f-bb9a-5e3355611b24&quot;
   }
 }</component>
@@ -72,6 +72,9 @@
   </component>
   <component name="OptimizeOnSaveOptions">
     <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
@@ -86,7 +89,7 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Cargo.Build rigscribe.executor": "Run",
     "Cargo.Run rigscribe.executor": "Run",
-    "Cargo.Run.executor": "Profiler",
+    "Cargo.Run.executor": "Run",
     "Cargo.Test lib::tests.executor": "Run",
     "Cargo.Test tests::it_works.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -97,7 +100,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "code.cleanup.on.save": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "pipline",
+    "git-widget-placeholder": "#1 on tools",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/hamzeghalebi/project/opensource/rigscribe",
     "node.js.detected.package.stylelint": "true",
@@ -110,7 +113,7 @@
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
     "org.rust.first.attach.projects": "true",
     "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "settings.editor.selected.configurable": "junie.application.models",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -165,6 +168,9 @@
       <workItem from="1765486470295" duration="3484000" />
       <workItem from="1765634942239" duration="2899000" />
       <workItem from="1765736534812" duration="2216000" />
+      <workItem from="1766083937987" duration="8000" />
+      <workItem from="1766083956639" duration="173000" />
+      <workItem from="1766084137867" duration="2542000" />
     </task>
     <servers />
   </component>
@@ -212,17 +218,6 @@
   <component name="VcsManagerConfiguration">
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/agents.rs</url>
-          <line>11</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
