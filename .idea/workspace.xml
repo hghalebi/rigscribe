@@ -17,7 +17,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e7547298-531d-4f68-9426-f296de526604" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/pipline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipline.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +163,7 @@
       <workItem from="1765736534812" duration="2216000" />
       <workItem from="1766083937987" duration="8000" />
       <workItem from="1766083956639" duration="173000" />
-      <workItem from="1766084137867" duration="3695000" />
+      <workItem from="1766084137867" duration="4200000" />
     </task>
     <servers />
   </component>

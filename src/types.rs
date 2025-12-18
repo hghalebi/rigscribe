@@ -24,6 +24,9 @@ impl Default for RigScribeConfig {
 }
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct Intent {
+    #[schemars(
+        description = "he raw user intent. You must analyze this to extract technical constraints."
+    )]
     pub text: String,
 }
 
@@ -39,7 +42,13 @@ impl Intent {
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct Specification {
+    #[schemars(
+        description = "The primary goal derived from the user's intent. concise and clear."
+    )]
     pub goal: String,
+    #[schemars(
+        description = "A list of technical constraints, risks, and negative constraints. Format as a bulleted string."
+    )]
     pub constraints: String,
 }
 
