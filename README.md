@@ -1,6 +1,3 @@
-Here is the updated `README.md`. I have integrated the "Series" context directly into the header and introduction. This makes it immediately clear that this is part of a larger educational roadmap.
-
----
 
 # RigScribe
 
