@@ -22,20 +22,12 @@ impl Tool for Deconstructor {
     type Output = Specification;
 
     async fn definition(&self, _prompt: String) -> ToolDefinition {
+        let schema = schemars::schema_for!(Intent);
+        let parameters = serde_json::to_value(schema).unwrap();
         ToolDefinition {
             name: "Deconstructor".to_string(),
             description: "this tools take a raw prompte and give back it Specification include goal and constrian".to_string(),
-            parameters: serde_json::json!({
-                 "type": "object",
-                 "properties": {
-                     "text": {
-                         "type": "string",
-                         "description": "Raw prompte/intend which need to be analysed"
-                     },
-
-                 },
-                 "required":["text"]
-             }),
+            parameters: parameters,
         }
     }
 
@@ -83,25 +75,12 @@ impl Tool for PromptReviewer {
     type Output = Artifact;
 
     async fn definition(&self, _prompt: String) -> ToolDefinition {
+        let schema = schemars::schema_for!(PromptReviewerArgs);
+        let parameters = serde_json::to_value(schema).unwrap();
         ToolDefinition {
             name: "PromptReviewer".to_string(),
             description: "this tools take a raw prompte it will evelaute that given promte wiuth its Specification include goal and constrian".to_string(),
-            parameters: serde_json::json!({
-                 "type": "object",
-                 "properties": {
-                     "raw_intent_text": {
-                         "type": "string",
-                         "description": "Raw prompte/intend which need to be analysed"
-                     },
-                     "goal": {
-                         "type": "string",
-                         "description": "Goal and constaint of intented task"
-                     },
-                     "constraints": { "type": "string" },
-                     "required":["raw_intent_text","gaol","constraints"],
-
-                 }
-             }),
+            parameters: parameters,
         }
     }
 
