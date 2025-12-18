@@ -1,6 +1,8 @@
 
 # RigScribe
-
+<p align="center">
+<img src="logo.jpeg" alt="RigScribe logo" width="60%">
+</p>
 **Automated Prompt Engineering for Rust**
 
 > **Rig Examples Series: Entry #1**
