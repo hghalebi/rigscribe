@@ -53,18 +53,18 @@ impl Tool for Deconstructor {
     }
 }
 
-/*#[derive(Deserialize, Debug, Clone, Serialize, JsonSchema)]
-pub struct PromptOperationArgs {
+#[derive(Deserialize, Debug, Clone, Serialize, JsonSchema)]
+pub struct PromptReviewerArgs {
     intent: Intent,
     spec: Specification,
-}*/
-
+}
+/*
 #[derive(Deserialize, Serialize, JsonSchema, Debug, Clone)]
 pub struct PromptReviewerArgs {
     pub raw_intent_text: String, // Simplified from 'Intent' struct
     pub goal: String,
     pub constraints: String,
-}
+}*/
 #[derive(Serialize, Deserialize)]
 pub struct PromptReviewer;
 impl Tool for PromptReviewer {
@@ -80,7 +80,7 @@ impl Tool for PromptReviewer {
         ToolDefinition {
             name: "PromptReviewer".to_string(),
             description: "this tools take a raw prompte it will evelaute that given promte wiuth its Specification include goal and constrian".to_string(),
-            parameters: parameters,
+            parameters,
         }
     }
 
@@ -102,7 +102,7 @@ impl Tool for PromptReviewer {
         Critisize following prompt base on given property:
         Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\n\
         Instruction: Be highly cretical and persimiste and find every defit or any point which could be better. and use all best practice and if needed use websearch.  \n",
-                            args.goal, args.constraints, args.raw_intent_text);
+                            args.spec.goal, args.spec.constraints, args.intent.text);
 
         let repons = prompt_reviewer.prompt(input).await?;
         let artifact_extractor = client.extractor::<Artifact>(MODEL).build();
