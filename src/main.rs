@@ -4,13 +4,13 @@ use termimad::MadSkin;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Input: The raw, often vague user intent.
-    let raw_prompt = "generate a function in python";
+    let raw_prompt = "generate python fonction";
     eprintln!("\n\nOptimizing ...\n\n");
 
     // Logic: Execute the multi-agent pipeline.
     // Note: The '2' argument is currently unused (placeholder).
     // It is reserved to maintain signature consistency for a future caching ID.
-    let optimized_prompt = RigScribe::optimize_agentic(raw_prompt, 2).await?;
+    let optimized_prompt = RigScribe::optimize_agentic(raw_prompt).await?;
 
     // Render the resulting Markdown to the terminal.
     let skin = MadSkin::default();
