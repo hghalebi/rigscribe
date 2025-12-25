@@ -1,6 +1,5 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use rigscribe::utilities::save_artifacts;
 use rigscribe::{Result, RigScribe, ScopeId};
 use termimad::MadSkin;
 /// Entry point: Orchestrates the transformation of user intent into a system prompt.
