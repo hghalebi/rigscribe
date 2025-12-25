@@ -1,4 +1,3 @@
-
 # RigScribe
 
 <p align="center">
@@ -36,20 +35,32 @@ As the foundation of our series, this project uses Rust's type safety and Agenti
 RigScribe acts as a quality assurance layer for your AI interactions. It transforms vague requests into professional system prompts in three steps:
 
 1. **Raw Input**
-You provide a simple, human-readable goal.
-* *Example:* "Summarize this text."
+   You provide a simple, human-readable goal.
+   * *Example:* "Summarize this text."
 
 
 2. **Agentic Refinement**
-RigScribe hands this goal to a specialized "Expert Agent." This agent automatically:
-* Clarifies the instruction.
-* Injects structural best practices.
-* Removes ambiguity.
+   RigScribe hands this goal to a specialized "Expert Agent." This agent automatically:
+   * Clarifies the instruction.
+   * Injects structural best practices.
+   * Removes ambiguity.
 
 
 3. **Robust Output**
-The system returns a high-performance system prompt and caches it. You get state-of-the-art quality without manual engineering.
+   The system returns a high-performance system prompt. You get state-of-the-art quality without manual engineering.
 
+#### **Built-in Caching**
+
+RigScribe includes a persistent file-based cache. By utilizing a strongly-typed `ScopeId`, it automatically saves and retrieves optimized artifacts from disk, preventing redundant computations across sessions.
+
+```rust
+// RigScribe automatically handles file I/O for you.
+// If "./cache/2027.json" exists, it loads instantly.
+// If not, it runs the agents and saves the result.
+
+let scribe = RigScribe::new("./.cache");
+let artifact = scribe.optimize_with_cache("fix this code", ScopeId(2027)).await?;
+```
 ---
 
 ### **4. The Future: Self-Learning**
