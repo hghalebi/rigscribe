@@ -5,20 +5,17 @@ use termimad::MadSkin;
 /// Entry point: Orchestrates the transformation of user intent into a system prompt.
 #[tokio::main]
 async fn main() -> Result<()> {
-    let cache_path = PathBuf::from("./prompts_perssitense_cache");
+    // create caching path
+    let cache_path = PathBuf::from("./.prompts_perssitense_cache");
     let scribe = RigScribe::new(cache_path);
-    let id = ScopeId(2026);
+    let id = ScopeId(2027);
     // Input: The raw, often vague user intent.
-    let raw_prompt = " Role: Chief Prompt Officer\n\
-    Task: Review the draft for safety, clarity, and constraint compliance\n\
-    Output: Only the final system prompt text";
+    let raw_prompt = "write a python fonction";
     eprintln!("\n\nOptimizing ...\n\n");
 
-    // Logic: Execute the multi-agent pipeline.
-    // Note: The '2' argument is currently unused (placeholder).
-    // It is reserved to maintain signature consistency for a future caching ID.
+    // Execute the multi-agent optimization pipeline.
     let optimized_prompt = scribe.optimize_with_cache(raw_prompt, id).await?;
-
+    // Render the resulting Markdown artifact to the terminal.
     let skin = MadSkin::default();
     skin.print_text(optimized_prompt.system_prompt.as_str());
 
