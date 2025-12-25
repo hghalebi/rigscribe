@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 pub use error::{Result, ScribeError};
 use pipline::optimizer;
-use tokio::task::Id;
+
 pub use types::{Artifact, Intent, ScopeId, Specification};
 
 use crate::utilities::{read_artifact, save_artifacts};

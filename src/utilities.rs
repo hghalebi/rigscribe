@@ -48,7 +48,7 @@ pub async fn read_artifact<P: AsRef<Path>>(path: P) -> Result<Artifact> {
     let path = path.as_ref();
     let content = fs::read(path)
         .await
-        .map_err(|e| ScribeError::Config(format!("Failed to read file: {:?}", path)))?;
+        .map_err(|e| ScribeError::Config(format!("Failed to read file: {:?}\n {:?} ", path, e)))?;
 
     let artifact: Artifact = serde_json::from_slice(&content).map_err(|e| {
         ScribeError::Validation(format!(
