@@ -69,3 +69,8 @@ impl Artifact {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ScopeId(pub u64);
+
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
+pub struct Webquery {
+    pub(crate) query: String,
+}
