@@ -1,8 +1,8 @@
+use crate::error::map_provider_error;
 use crate::error::Result;
 use crate::error::ScribeError;
-use crate::error::map_provider_error;
-use crate::types::MODEL;
 pub use crate::types::{Artifact, Intent, Specification};
+use crate::types::{Webquery, MODEL};
 use crate::utilities::read_artifact;
 use crate::utilities::require_env;
 use rig::completion::Prompt;
@@ -12,6 +12,7 @@ use rig::providers::gemini::Client;
 use rig::{completion::ToolDefinition, tool::Tool};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use serpscraper::get_markdown_for_query;
 
 #[derive(Serialize, Deserialize)]
 pub struct Deconstructor;
@@ -59,13 +60,6 @@ pub struct PromptReviewerArgs {
     intent: Intent,
     spec: Specification,
 }
-/*
-#[derive(Deserialize, Serialize, JsonSchema, Debug, Clone)]
-pub struct PromptReviewerArgs {
-    pub raw_intent_text: String, // Simplified from 'Intent' struct
-    pub goal: String,
-    pub constraints: String,
-}*/
 #[derive(Serialize, Deserialize)]
 pub struct PromptReviewer;
 impl Tool for PromptReviewer {
@@ -108,6 +102,32 @@ impl Tool for PromptReviewer {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct WebSearcher;
+impl Tool for WebSearcher {
+    const NAME: &'static str = "WebSearcher";
+    type Error = ScribeError;
+    type Args = Webquery;
+    type Output = String;
+    async fn definition(&self, _prompt: String) -> ToolDefinition {
+        let schema = schemars::schema_for!(Webquery);
+        let parameters = serde_json::to_value(schema).unwrap();
+        ToolDefinition {
+            name: "WebSearcher".to_string(),
+            description: "this tools query  will search on web and retern result in one string".to_string(),
+            parameters,
+        }
+    }
+    async fn call(&self, args: Self::Args) -> Result<Self::Output> {
+        println!("[Tool Calling]-> WebSearcher");
+        let api_key = std::env::var("SERPER_API_KEY").map_err(
+            |e| 
+                ScribeError::Config(format!("SERPER_API_KEY not set: {}", e))
+        );
+        let markdown = get_markdown_for_query(&args.query, &api_key?.to_string()).await;
+        Ok(markdown.unwrap().to_string())
+    }
+}
 pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     require_env("GEMINI_API_KEY")?;
     let client = Client::from_env();
@@ -121,17 +141,19 @@ pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
         .preamble(system_prompt.as_str())
         .tool(Deconstructor)
         .tool(PromptReviewer)
+        .tool(WebSearcher)
         .build();
 
     let input = format!(
-            "Follow this workflow to optimize the prompt:
+        "Follow this workflow to optimize the prompt:
             1. Use the Deconstructor tool to analyze the goal and constraints of: '{}'
             2. Use the PromptReviewer to check and refine the draft.
-            3. Finally, provide the optimized system prompt.
+            3. Use the WebSearcher to find the best practice related task/goal.
+            4. Finally, provide the optimized system prompt.
 
             Constraint: The final output must be the system prompt only, but you MUST use your tools first to arrive at that result.",
-            prompt.text
-        );
+        prompt.text
+    );
     let optimized_prompt = prompt_officer
         .prompt(input)
         .multi_turn(10)
