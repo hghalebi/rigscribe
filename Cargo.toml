@@ -1,10 +1,7 @@
 [package]
 name = "rigscribe"
-version = "0.1.4"
+version = "0.1.0"
 edition = "2024"
-description = "A powerful agentic AI coding assistant and prompt optimizer."
-license = "MIT"
-repository = "https://github.com/hghalebi/rigscribe"
 
 [dependencies]
 

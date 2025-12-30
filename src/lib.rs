@@ -1,13 +1,12 @@
 mod error;
-pub mod agents;
-pub mod tools;
+pub mod pipline;
 mod types;
 pub mod utilities;
 
 use std::path::PathBuf;
 
 pub use error::{Result, ScribeError};
-use agents::optimizer::optimizer;
+use pipline::optimizer;
 
 pub use types::{Artifact, Intent, ScopeId, Specification};
 
