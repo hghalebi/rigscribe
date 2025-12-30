@@ -7,6 +7,15 @@ use crate::{
     error::{Result, ScribeError},
 };
 
+/// Retrieves an environment variable or returns a configuration error.
+///
+/// # Arguments
+///
+/// * `name` - The name of the environment variable.
+///
+/// # Errors
+///
+/// Returns [`ScribeError::Config`] if the variable is not set.
 pub fn require_env(name: &str) -> Result<String> {
     match std::env::var(name) {
         Ok(val) => Ok(val),
@@ -14,6 +23,15 @@ pub fn require_env(name: &str) -> Result<String> {
     }
 }
 
+/// Saves an [`Artifact`] to disk as a JSON file.
+///
+/// If the provided path does not have a `.json` extension, it will be appended.
+/// The parent directory is created if it does not exist.
+///
+/// # Arguments
+///
+/// * `p` - The path to save the artifact to.
+/// * `artifact` - The artifact to serialize and save.
 pub async fn save_artifacts<P: AsRef<Path>>(p: P, artifact: &Artifact) -> Result<()> {
     let mut path = p.as_ref().to_path_buf();
     // check for  json extention
@@ -43,6 +61,16 @@ pub async fn save_artifacts<P: AsRef<Path>>(p: P, artifact: &Artifact) -> Result
     Ok(())
 }
 
+/// Reads and deserializes an [`Artifact`] from a JSON file.
+///
+/// # Arguments
+///
+/// * `path` - The path to the JSON file.
+///
+/// # Errors
+///
+/// Returns [`ScribeError::Config`] if the file cannot be read.
+/// Returns [`ScribeError::Validation`] if deserialization fails.
 pub async fn read_artifact<P: AsRef<Path>>(path: P) -> Result<Artifact> {
     let path = path.as_ref();
     let content = fs::read(path)

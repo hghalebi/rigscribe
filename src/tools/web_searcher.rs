@@ -5,6 +5,10 @@ use rig::tool::Tool;
 use serde::{Deserialize, Serialize};
 use serpscraper::get_markdown_for_query;
 
+/// A tool for performing web searches to gather external information.
+///
+/// This tool uses the `serpscraper` library (wrapping an API like Serper.dev)
+/// to fetch search results in Markdown format.
 #[derive(Serialize, Deserialize)]
 pub struct WebSearcher;
 

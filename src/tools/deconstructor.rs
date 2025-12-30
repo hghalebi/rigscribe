@@ -8,6 +8,10 @@ use serde::{Deserialize, Serialize};
 use rig::client::ProviderClient;
 use rig::prelude::*; // Needed for .prompt() method
 
+/// A tool that analyzes a raw user prompt to extract key constraints and goals.
+///
+/// This tool uses a specialized "Senior Solution Architect" agent to process the
+/// [`Intent`] and produce a structured [`Specification`].
 #[derive(Serialize, Deserialize)]
 pub struct Deconstructor;
 
@@ -35,11 +39,9 @@ impl Tool for Deconstructor {
         let architect = client
             .agent(MODEL)
             .preamble(
-                "
-                Role: Senior Solution Architect\n\
+                "\n                Role: Senior Solution Architect\n\
                 Task: Extract constraints and risks and main goal of given request\n\
-                Output: A short bullet list, no prose
-                ",
+                Output: A short bullet list, no prose\n                ",
             )
             .build();
         
