@@ -1,21 +1,13 @@
 mod error;
-<<<<<<< HEAD
-pub mod pipline;
-=======
 pub mod agents;
 pub mod tools;
->>>>>>> e62e1b9 (only refactor all tools and type in sperate files withouth change any thing elese)
 mod types;
 pub mod utilities;
 
 use std::path::PathBuf;
 
 pub use error::{Result, ScribeError};
-<<<<<<< HEAD
-use pipline::optimizer;
-=======
 use agents::optimizer::optimizer;
->>>>>>> e62e1b9 (only refactor all tools and type in sperate files withouth change any thing elese)
 
 pub use types::{Artifact, Intent, ScopeId, Specification};
 
