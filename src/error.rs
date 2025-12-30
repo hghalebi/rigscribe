@@ -24,9 +24,6 @@ pub enum ScribeError {
 
     #[error("Extraction failed: {0}")]
     Extraction(#[from] rig::extractor::ExtractionError),
-
-    #[error("Client error: {0}")]
-    ClientError(#[from] rig::http_client::Error),
 }
 
 pub fn map_provider_error(e: rig::completion::PromptError) -> ScribeError {
