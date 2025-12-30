@@ -2,3 +2,5 @@
 .*
 .idea
 .prompts_perssitense_cache
+logs
+STREAMING_DEBUG_REPORT.md
