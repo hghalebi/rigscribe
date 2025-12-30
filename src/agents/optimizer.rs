@@ -25,6 +25,20 @@ use rig::tool::Tool;
 /// # Returns
 ///
 /// A `Result` containing the optimized [`Artifact`] (the system prompt).
+///
+/// # Examples
+///
+/// ```no_run
+/// use rigscribe::{agents::optimizer::optimizer, Intent};
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let intent = Intent::new("Optimize this").unwrap();
+///     // Requires GEMINI_API_KEY
+///     let artifact = optimizer(intent).await.unwrap();
+///     println!("{}", artifact.system_prompt);
+/// }
+/// ```
 pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     require_env("GEMINI_API_KEY")?;
     let client = Client::new(require_env("GEMINI_API_KEY")?)?;
@@ -86,4 +100,11 @@ pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     };
 
     Ok(artifact)
+}
+
+#[cfg(test)]
+mod tests {
+    // TODO (UNTESTABLE): test_optimizer_flow
+    // This high-level function instantiates the Client and builds an agent internally.
+    // Testing it requires a full integration environment with API keys.
 }

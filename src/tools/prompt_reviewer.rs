@@ -14,9 +14,9 @@ use rig::prelude::*;
 #[derive(Deserialize, Debug, Clone, Serialize, JsonSchema)]
 pub struct PromptReviewerArgs {
     /// The original intent from the user.
-    intent: Intent,
+    pub(crate) intent: Intent,
     /// The technical specification derived from the intent.
-    spec: Specification,
+    pub(crate) spec: Specification,
 }
 
 /// A tool that critically evaluates and refines a draft prompt.
@@ -33,6 +33,21 @@ impl Tool for PromptReviewer {
     type Args = PromptReviewerArgs;
     type Output = Artifact;
 
+    /// Returns the tool definition.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rig::tool::Tool;
+    /// use rigscribe::tools::prompt_reviewer::PromptReviewer;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let tool = PromptReviewer;
+    ///     let def = tool.definition("".into()).await;
+    ///     assert_eq!(def.name, "PromptReviewer");
+    /// }
+    /// ```
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         let schema = schemars::schema_for!(PromptReviewerArgs);
         let parameters = serde_json::to_value(schema).unwrap();
@@ -43,6 +58,17 @@ impl Tool for PromptReviewer {
         }
     }
 
+    /// Executes the tool.
+    ///
+    /// # Errors
+    ///
+    /// Returns error if API keys are missing or LLM fails.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// // Requires valid setup
+    /// ```
     async fn call(&self, args: Self::Args) -> Result<Self::Output> {
         tracing::info!("[Tool Calling]-> PromptReviewer with args: {:?}", args);
         require_env("GEMINI_API_KEY")?;
@@ -55,14 +81,24 @@ impl Tool for PromptReviewer {
             .preamble(system_prompt.as_str())
             .tool(WebSearcher)
             .build();
-        let input = format!("
-        Critisize following prompt base on given property:
-        Goal:\n{}\n\nConstraints:\n{}\n\nDraft:\n{}\n\n        Instruction: Be highly critical and pessimistic. 
+        
+        let input = format!(
+            "\n        Critisize following prompt base on given property:\n        Goal:\n{}
+
+Constraints:
+{}
+
+Draft:
+{}
+
+
+        Instruction: Be highly critical and pessimistic. 
         1. You MUST first use the 'WebSearcher' tool to research state-of-the-art prompt engineering techniques and best practices specifically for this type of task.
         2. Use the search results to find every deficit in the draft.
         3. Rewrite the prompt to be flawless.
         \n",
-                            args.spec.goal, args.spec.constraints, args.intent.text);
+            args.spec.goal, args.spec.constraints, args.intent.text
+        );
 
         let mut stream = crate::agents::multi_turn_prompt(prompt_reviewer, input, Vec::new()).await;
         let mut full_response = String::new();
@@ -84,5 +120,20 @@ impl Tool for PromptReviewer {
 
         tracing::debug!("PromptReviewer produced artifact: {:?}", artifact);
         Ok(artifact)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_prompt_reviewer_definition() {
+        let tool = PromptReviewer;
+        let def = tool.definition("".into()).await;
+        assert_eq!(def.name, "PromptReviewer");
+        let params = def.parameters.to_string();
+        assert!(params.contains("intent"));
+        assert!(params.contains("spec"));
     }
 }

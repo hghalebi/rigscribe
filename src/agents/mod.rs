@@ -13,6 +13,16 @@ use std::pin::Pin;
 use thiserror::Error;
 
 /// Represents errors that can occur during streaming communication with an agent.
+///
+/// # Examples
+///
+/// ```
+/// use rigscribe::agents::StreamingError;
+/// use rig::completion::CompletionError;
+///
+/// let err = StreamingError::Completion(CompletionError::ResponseError("bad".into()));
+/// assert!(format!("{}", err).contains("CompletionError"));
+/// ```
 #[derive(Debug, Error)]
 pub enum StreamingError {
     /// Error during the completion process (e.g., network issue).
@@ -46,6 +56,12 @@ pub type StreamingResult = Pin<Box<dyn Stream<Item = std::result::Result<Text, S
 /// # Returns
 ///
 /// A `StreamingResult` that yields text chunks as they are generated.
+///
+/// # Examples
+///
+/// ```no_run
+/// // This example is hypothetical as it requires a configured Agent which needs API keys.
+/// ```
 pub async fn multi_turn_prompt<M>(
     agent: Agent<M>,
     prompt: impl Into<Message> + Send,
@@ -157,4 +173,18 @@ where
         }
 
     })) as _
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_streaming_error_fmt() {
+        let err = StreamingError::Completion(completion::CompletionError::ResponseError("Test error".into()));
+        assert!(format!("{}", err).contains("CompletionError"));
+    }
+
+    // TODO (UNTESTABLE): test_multi_turn_prompt
+    // Requires a mock Agent<M> which is hard to construct without rig::providers::Mock (which isn't standard here).
 }

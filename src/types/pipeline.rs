@@ -20,6 +20,18 @@ impl Intent {
     /// # Errors
     ///
     /// Returns a [`ScribeError::Validation`] if the input text is empty or whitespace-only.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rigscribe::Intent;
+    ///
+    /// let intent = Intent::new("Create a Python script").unwrap();
+    /// assert_eq!(intent.text, "Create a Python script");
+    ///
+    /// let err = Intent::new("   ").unwrap_err();
+    /// assert!(format!("{}", err).contains("Invalid request"));
+    /// ```
     pub fn new(text: impl Into<String>) -> Result<Self> {
         let text = text.into();
         if text.trim().is_empty() {
@@ -53,4 +65,57 @@ pub struct Specification {
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct Webquery {
     pub(crate) query: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_intent_new_valid() {
+        let intent = Intent::new("valid input").expect("Should succeed");
+        assert_eq!(intent.text, "valid input");
+    }
+
+    #[test]
+    fn test_intent_new_trimming_empty() {
+        let res = Intent::new("   ");
+        match res {
+            Err(ScribeError::Validation(msg)) => assert_eq!(msg, "Request is empty"),
+            _ => panic!("Expected Validation error"),
+        }
+    }
+
+    #[test]
+    fn test_intent_new_completely_empty() {
+        let res = Intent::new("");
+        match res {
+            Err(ScribeError::Validation(msg)) => assert_eq!(msg, "Request is empty"),
+            _ => panic!("Expected Validation error"),
+        }
+    }
+
+    #[test]
+    fn test_specification_serialization() {
+        let spec = Specification {
+            goal: "Goal".into(),
+            constraints: "None".into(),
+        };
+        let json = serde_json::to_string(&spec).unwrap();
+        assert!(json.contains("Goal"));
+    }
+
+    #[test]
+    fn test_webquery_serialization() {
+        let wq = Webquery { query: "rust".into() };
+        let json = serde_json::to_string(&wq).unwrap();
+        assert!(json.contains("rust"));
+    }
+    
+    #[test]
+    fn test_intent_json_schema() {
+        let schema = schemars::schema_for!(Intent);
+        let json = serde_json::to_string(&schema).unwrap();
+        assert!(json.contains("user intent"));
+    }
 }

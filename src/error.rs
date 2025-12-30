@@ -9,6 +9,15 @@ pub type Result<T> = std::result::Result<T, ScribeError>;
 ///
 /// This enum consolidates validation failures, configuration issues, LLM provider errors,
 /// and internal processing faults into a single type.
+///
+/// # Examples
+///
+/// ```
+/// use rigscribe::ScribeError;
+///
+/// let err = ScribeError::Validation("Request is too short".into());
+/// assert!(format!("{}", err).contains("Invalid request"));
+/// ```
 #[derive(Debug, Error)]
 pub enum ScribeError {
     /// The input provided by the user or an internal component was invalid.
@@ -47,4 +56,35 @@ pub enum ScribeError {
     /// A lower-level HTTP client error occurred.
     #[error("Client error: {0}")]
     ClientError(#[from] rig::http_client::Error),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validation_error_formatting() {
+        let err = ScribeError::Validation("Empty input".to_string());
+        let msg = format!("{}", err);
+        assert!(msg.contains("Invalid request"));
+        assert!(msg.contains("Empty input"));
+        assert!(msg.contains("Hint: Pass a non empty request string"));
+    }
+
+    #[test]
+    fn test_config_error_formatting() {
+        let err = ScribeError::Config("MISSING_KEY".to_string());
+        let msg = format!("{}", err);
+        assert!(msg.contains("Configuration error"));
+        assert!(msg.contains("MISSING_KEY"));
+        assert!(msg.contains("Hint: check required env vars"));
+    }
+
+    #[test]
+    fn test_protocol_violation_error_formatting() {
+        let err = ScribeError::ProtocolViolation("Bad JSON".to_string());
+        let msg = format!("{}", err);
+        assert!(msg.contains("Protocol violation"));
+        assert!(msg.contains("Bad JSON"));
+    }
 }

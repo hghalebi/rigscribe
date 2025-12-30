@@ -52,6 +52,13 @@ impl RigScribe {
     /// # Arguments
     ///
     /// * `cache_dir` - Path to the directory where artifacts should be stored.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rigscribe::RigScribe;
+    /// let scribe = RigScribe::new("/tmp/cache");
+    /// ```
     pub fn new(cache_dir: impl Into<PathBuf>) -> Self {
         Self {
             cache_dir: cache_dir.into(),
@@ -62,6 +69,26 @@ impl RigScribe {
     ///
     /// This method converts the string request into an [`Intent`] and passes it
     /// to the [`optimizer`](agents::optimizer::optimizer) agent.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - The raw user intent string.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ScribeError::Provider`] if the LLM fails, or [`ScribeError::Validation`]
+    /// if the request is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use rigscribe::RigScribe;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let artifact = RigScribe::optimize_agentic("Make a CLI").await.unwrap();
+    /// }
+    /// ```
     pub async fn optimize_agentic(request: impl Into<String>) -> Result<Artifact> {
         let intent = Intent {
             text: request.into(),
@@ -79,6 +106,18 @@ impl RigScribe {
     ///
     /// * `request` - The user's prompt intent.
     /// * `id` - A unique identifier for this request scope.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use rigscribe::{RigScribe, ScopeId};
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let scribe = RigScribe::new(".cache");
+    ///     let artifact = scribe.optimize_with_cache("Make a CLI", ScopeId(1)).await.unwrap();
+    /// }
+    /// ```
     pub async fn optimize_with_cache(
         &self,
         request: impl Into<String>,
@@ -97,5 +136,47 @@ impl RigScribe {
         save_artifacts(&path, &fresh_artifact).await?;
         info!("Optimize prompt cached to: {:?}", path);
         Ok(fresh_artifact)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rigscribe_new() {
+        let scribe = RigScribe::new("test_dir");
+        assert_eq!(scribe.cache_dir.to_str().unwrap(), "test_dir");
+    }
+
+    // TODO (UNTESTABLE): optimize_agentic requires a valid GEMINI_API_KEY and network access.
+    // Mocking the entire rig library or the HTTP client is not possible without refactoring
+    // to use dependency injection for the Client/Agent.
+
+    // TODO (UNTESTABLE): optimize_with_cache (miss path) relies on optimize_agentic.
+    
+    #[tokio::test]
+    async fn test_optimize_with_cache_hit() {
+        // Setup: Create a fake cache entry
+        let temp_dir = std::env::temp_dir();
+        let cache_dir = temp_dir.join("rigscribe_test_cache");
+        let _ = tokio::fs::create_dir_all(&cache_dir).await;
+        
+        let id = ScopeId(999);
+        let artifact = Artifact::new("cached prompt", "cached agent");
+        let file_path = cache_dir.join("999.json");
+        
+        save_artifacts(&file_path, &artifact).await.expect("Setup failed");
+
+        // Execute: Hit the cache
+        let scribe = RigScribe::new(&cache_dir);
+        let result = scribe.optimize_with_cache("ignored request", id).await.expect("Cache hit failed");
+
+        // Verify
+        assert_eq!(result.system_prompt, "cached prompt");
+        assert_eq!(result.signed_by, "cached agent");
+
+        // Cleanup
+        let _ = tokio::fs::remove_dir_all(cache_dir).await;
     }
 }
