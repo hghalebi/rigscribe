@@ -19,12 +19,12 @@ impl Tool for WebSearcher {
         let parameters = serde_json::to_value(schema).unwrap();
         ToolDefinition {
             name: "WebSearcher".to_string(),
-            description: "this tools query  will search on web and retern result in one string".to_string(),
+            description: "A research tool. Use this to find best practices, domain-specific knowledge, or to verify assumptions about the user's goal.".to_string(),
             parameters,
         }
     }
     async fn call(&self, args: Self::Args) -> Result<Self::Output> {
-        println!("[Tool Calling]-> WebSearcher");
+        tracing::info!("[Tool Calling]-> WebSearcher with args: {:?}", args);
         let api_key = std::env::var("SERPER_API_KEY").map_err(
             |e| 
                 ScribeError::Config(format!("SERPER_API_KEY not set: {}", e))

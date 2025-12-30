@@ -1,10 +1,12 @@
-use crate::error::{Result, ScribeError, map_provider_error};
+use crate::error::{Result, ScribeError};
 use crate::types::{Artifact, Intent, MODEL};
 use crate::tools::{deconstructor::Deconstructor, prompt_reviewer::PromptReviewer, web_searcher::WebSearcher};
 use crate::utilities::require_env;
 use rig::providers::gemini::Client;
-use rig::prelude::*;
-use rig::completion::Prompt;
+use futures::StreamExt;
+use rig::client::CompletionClient;
+use crate::agents::multi_turn_prompt;
+use rig::tool::Tool;
 
 pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     require_env("GEMINI_API_KEY")?;
@@ -13,6 +15,16 @@ pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     let artifact: Artifact = serde_json::from_str(system_prompt_json)
          .map_err(|e| ScribeError::Validation(format!("Failed to parse embedded optimizer.json: {}", e)))?;
     let system_prompt = artifact.system_prompt;
+
+    // Log tool definitions for verbose output
+    let deconstructor_def = Deconstructor.definition("".to_string()).await;
+    tracing::info!("Tool Definition - Deconstructor: {:?}", deconstructor_def);
+
+    let prompt_reviewer_def = PromptReviewer.definition("".to_string()).await;
+    tracing::info!("Tool Definition - PromptReviewer: {:?}", prompt_reviewer_def);
+
+    let web_searcher_def = WebSearcher.definition("".to_string()).await;
+    tracing::info!("Tool Definition - WebSearcher: {:?}", web_searcher_def);
 
     let prompt_officer = client
         .agent(MODEL)
@@ -25,17 +37,32 @@ pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     let input = format!(
         "Follow this workflow to optimize the prompt:
             1. Use the Deconstructor tool to analyze the goal and constraints of: '{}'
-            2. Use the PromptReviewer to check and refine the draft.
-            3. Use the WebSearcher to find the best practice related task/goal.
-            4. Finally, provide the optimized system prompt.
+            2. Use the PromptReviewer to check, you must research (using WebSearcher), and refine the draft.
+            3. Finally, provide the optimized system prompt.
 
             Constraint: The final output must be the system prompt only, but you MUST use your tools first to arrive at that result.",
         prompt.text
     );
-    let optimized_prompt = prompt_officer
-        .prompt(input)
-        .await
-        .map_err(map_provider_error)?;
+    let mut stream =multi_turn_prompt( prompt_officer,input,Vec::new()).await;
+
+    tracing::info!("Starting optimization streaming...");
+    let mut optimized_prompt = String::new();
+    while let Some(res) = stream.next().await {
+        match res {
+            Ok(text) => {
+                print!("{}", text.text);
+                use std::io::Write;
+                let _ = std::io::stdout().flush();
+                optimized_prompt.push_str(&text.text);
+            }
+            Err(e) => {
+                tracing::error!("Streaming error: {}", e);
+                return Err(ScribeError::ProtocolViolation(e.to_string()));
+            }
+        }
+    }
+    println!();
+    tracing::info!("Optimization complete. Final artifact length: {}", optimized_prompt.len());
     let artifact = Artifact {
         system_prompt: optimized_prompt,
         signed_by: "".to_string(),

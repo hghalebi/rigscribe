@@ -29,11 +29,4 @@ pub enum ScribeError {
     ClientError(#[from] rig::http_client::Error),
 }
 
-pub fn map_provider_error(e: rig::completion::PromptError) -> ScribeError {
-    let msg = e.to_string();
-    if msg.contains("though_signature") || msg.contains("INVALID_ARGUMENT") {
-        ScribeError::ProtocolViolation(msg)
-    } else {
-        ScribeError::Provider(e)
-    }
-}
+
