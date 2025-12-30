@@ -8,7 +8,11 @@ async fn main() -> Result<()> {
     // create caching path
     let cache_path = PathBuf::from("./.prompts_perssitense_cache");
     let scribe = RigScribe::new(cache_path);
+<<<<<<< HEAD
     let id = ScopeId(2028);
+=======
+    let id = ScopeId(2031);
+>>>>>>> e62e1b9 (only refactor all tools and type in sperate files withouth change any thing elese)
     // Input: The raw, often vague user intent.
     let raw_prompt = "write a python fonction";
     eprintln!("\n\nOptimizing ...\n\n");
