@@ -8,7 +8,7 @@ async fn main() -> Result<()> {
     // create caching path
     let cache_path = PathBuf::from("./.prompts_perssitense_cache");
     let scribe = RigScribe::new(cache_path);
-    let id = ScopeId(2028);
+    let id = ScopeId(2031);
     // Input: The raw, often vague user intent.
     let raw_prompt = "write a python fonction";
     eprintln!("\n\nOptimizing ...\n\n");
