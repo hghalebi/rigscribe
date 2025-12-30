@@ -5,11 +5,10 @@ use crate::utilities::require_env;
 use rig::providers::gemini::Client;
 use rig::prelude::*;
 use rig::completion::Prompt;
-use rig::client::ProviderClient;
 
 pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     require_env("GEMINI_API_KEY")?;
-    let client = Client::from_env();
+    let client = Client::new(require_env("GEMINI_API_KEY")?)?;
     let system_prompt_json = include_str!("../../data/optimizer.json");
     let artifact: Artifact = serde_json::from_str(system_prompt_json)
          .map_err(|e| ScribeError::Validation(format!("Failed to parse embedded optimizer.json: {}", e)))?;
