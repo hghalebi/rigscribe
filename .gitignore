@@ -1,3 +1,4 @@
 /target
 .*
 .idea
+.prompts_perssitense_cache
