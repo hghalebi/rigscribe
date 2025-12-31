@@ -12,18 +12,56 @@ use rig::{
 use std::pin::Pin;
 use thiserror::Error;
 
+/// Represents errors that can occur during streaming communication with an agent.
+///
+/// # Examples
+///
+/// ```
+/// use rigscribe::agents::StreamingError;
+/// use rig::completion::CompletionError;
+///
+/// let err = StreamingError::Completion(CompletionError::ResponseError("bad".into()));
+/// assert!(format!("{}", err).contains("CompletionError"));
+/// ```
 #[derive(Debug, Error)]
 pub enum StreamingError {
+    /// Error during the completion process (e.g., network issue).
     #[error("CompletionError: {0}")]
     Completion(#[from] CompletionError),
+    /// Error related to prompt construction or validation.
     #[error("PromptError: {0}")]
     Prompt(#[from] Box<PromptError>),
+    /// Error occurred while executing a tool.
     #[error("ToolSetError: {0}")]
     Tool(#[from] ToolSetError),
 }
 
+/// A type alias for a pinned, boxed stream of text chunks or errors.
 pub type StreamingResult = Pin<Box<dyn Stream<Item = std::result::Result<Text, StreamingError>> + Send>>;
 
+/// Manages a multi-turn conversation with an agent, handling tool calls and streaming responses.
+///
+/// This function executes a loop where it:
+/// 1. Sends the current prompt and chat history to the agent.
+/// 2. Streams the response back to the caller.
+/// 3. Detects and executes tool calls.
+/// 4. Appends tool results to the chat history and continues the conversation if necessary.
+///
+/// # Arguments
+///
+/// * `agent` - The configured Rig agent.
+/// * `prompt` - The initial message to start or continue the conversation.
+/// * `chat_history` - A vector of previous messages to maintain context.
+///
+/// # Returns
+///
+/// A `StreamingResult` that yields text chunks as they are generated.
+///
+/// # Examples
+///
+/// ```no_run
+/// // This example is hypothetical as it requires a configured Agent which needs API keys.
+/// ```
 pub async fn multi_turn_prompt<M>(
     agent: Agent<M>,
     prompt: impl Into<Message> + Send,
@@ -135,4 +173,18 @@ where
         }
 
     })) as _
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_streaming_error_fmt() {
+        let err = StreamingError::Completion(completion::CompletionError::ResponseError("Test error".into()));
+        assert!(format!("{}", err).contains("CompletionError"));
+    }
+
+    // TODO (UNTESTABLE): test_multi_turn_prompt
+    // Requires a mock Agent<M> which is hard to construct without rig::providers::Mock (which isn't standard here).
 }

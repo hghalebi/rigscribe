@@ -4,7 +4,14 @@ use rigscribe::{Result, RigScribe, ScopeId, logging};
 use termimad::MadSkin;
 use tracing::info;
 
-/// Entry point: Orchestrates the transformation of user intent into a system prompt.
+/// CLI Entry point for RigScribe.
+///
+/// This binary provides a command-line interface to the `RigScribe` library.
+/// It initializes logging, sets up a local cache, and runs a demo optimization task.
+///
+/// # Environment
+///
+/// Requires `GEMINI_API_KEY` to be set.
 #[tokio::main]
 async fn main() -> Result<()> {
     let _guard = logging::init_logging();

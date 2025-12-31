@@ -8,6 +8,37 @@ use rig::client::CompletionClient;
 use crate::agents::multi_turn_prompt;
 use rig::tool::Tool;
 
+/// Orchestrates the prompt optimization process.
+///
+/// This function acts as the main entry point for the "Prompt Officer" agent.
+/// It constructs the agent with access to `Deconstructor`, `PromptReviewer`, and `WebSearcher` tools.
+///
+/// # Workflow
+/// 1. **Deconstruct**: Analyze the user's intent to extract specifications.
+/// 2. **Review & Research**: Validate the request against best practices using web search.
+/// 3. **Refine**: Generate the final system prompt.
+///
+/// # Arguments
+///
+/// * `prompt` - The user's initial intent.
+///
+/// # Returns
+///
+/// A `Result` containing the optimized [`Artifact`] (the system prompt).
+///
+/// # Examples
+///
+/// ```no_run
+/// use rigscribe::{agents::optimizer::optimizer, Intent};
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let intent = Intent::new("Optimize this").unwrap();
+///     // Requires GEMINI_API_KEY
+///     let artifact = optimizer(intent).await.unwrap();
+///     println!("{}", artifact.system_prompt);
+/// }
+/// ```
 pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     require_env("GEMINI_API_KEY")?;
     let client = Client::new(require_env("GEMINI_API_KEY")?)?;
@@ -69,4 +100,11 @@ pub async fn optimizer(prompt: Intent) -> Result<Artifact> {
     };
 
     Ok(artifact)
+}
+
+#[cfg(test)]
+mod tests {
+    // TODO (UNTESTABLE): test_optimizer_flow
+    // This high-level function instantiates the Client and builds an agent internally.
+    // Testing it requires a full integration environment with API keys.
 }
