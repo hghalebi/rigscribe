@@ -5,7 +5,6 @@ use rig::completion::ToolDefinition;
 use rig::tool::Tool;
 use rig::providers::gemini::Client;
 use serde::{Deserialize, Serialize};
-use rig::completion::Prompt;
 use rig::client::ProviderClient;
 use rig::prelude::*; // Needed for .prompt() method
 
@@ -30,7 +29,7 @@ impl Tool for Deconstructor {
     }
 
     async fn call(&self, args: Self::Args) -> Result<Self::Output> {
-        println!("[Tool Calling]-> Deconstructor!");
+        tracing::info!("[Tool Calling]-> Deconstructor with args: {:?}", args);
         require_env("GEMINI_API_KEY")?;
         let client = Client::from_env();
         let architect = client
@@ -43,10 +42,26 @@ impl Tool for Deconstructor {
                 ",
             )
             .build();
-        let repons = architect.prompt(args.text.clone()).await?;
+        
+        let mut stream = crate::agents::multi_turn_prompt(architect, args.text.clone(), Vec::new()).await;
+        let mut full_response = String::new();
+        while let Some(res) = futures::StreamExt::next(&mut stream).await {
+             match res {
+                Ok(text) => {
+                     print!("{}", text.text);
+                     use std::io::Write;
+                     let _ = std::io::stdout().flush();
+                     full_response.push_str(&text.text);
+                }
+                Err(e) => return Err(ScribeError::ProtocolViolation(e.to_string())),
+            }
+        }
+        println!();
+        
         let spec_extractor = client.extractor::<Specification>(MODEL).build();
-        let spec = spec_extractor.extract(repons).await;
+        let spec = spec_extractor.extract(full_response).await?;
 
-        Ok(spec?)
+        tracing::debug!("Deconstructor extracted spec: {:?}", spec);
+        Ok(spec)
     }
 }
